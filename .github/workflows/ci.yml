@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        # La más antigua que admite el paquete y la de las imágenes de los bots
+        python-version: ['3.9', '3.14']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest pyflakes
+      - run: python -m pyflakes name_parser.py tests/
+      - run: python -m pytest -q
+      # Que se instala y se importa como lo harán los bots
+      - run: pip install . && cd / && python -c "import name_parser; print(name_parser.__version__)"

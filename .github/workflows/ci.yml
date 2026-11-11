@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
-        # La más antigua que admite el paquete y la de las imágenes de los bots
-        python-version: ['3.9', '3.14']
+        # La de las imágenes de los bots y una anterior. El runner ya no
+        # ofrece 3.9, la más antigua que admite el paquete
+        python-version: ['3.12', '3.14']
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

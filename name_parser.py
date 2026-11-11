@@ -15,7 +15,7 @@ import re
 import unicodedata
 
 # The version of the package (see pyproject.toml, which has to say the same)
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 # Valid video extensions
 VALID_EXTENSIONS = {"mkv", "mp4", "avi", "mov", "wmv", "flv", "webm", "mpg", "mpeg", "m4v", "ts", "m2ts"}

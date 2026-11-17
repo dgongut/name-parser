@@ -448,6 +448,28 @@ for alias, expected in [("FullHD", "1080p"), ("FHD", "1080p"), ("HD", "HD"), ("m
 		("720p", "720p"), ("1080p", "1080p"), ("2160p", "4K"), ("4K", "4K")]:
 	check_fields(f"Show.S01E02.The.Buys.{alias}.mkv", episode_title="The Buys", resolution=expected)
 
+# A platform tag tells no season pack or movie apart from its siblings, so it
+# never leaves them without a name: every declared tag, with its separators
+# and its '+' as releases write them
+PACK_TEMPLATE = "{title} S{season.2}[ ({year})]"
+for tag in _PLATFORM_TAGS:
+	for spelled in sorted({tag, tag.replace(" ", ""), tag.replace(" ", "."), tag.title() + "+"}):
+		check(f"platform tag {spelled!r} in a season pack",
+			suggest_name(f"Blue Bloods (2010) S06 [PACK][{spelled} WEB-DL 1080p AVC ES-EN AAC 2.0 Subs][HDO]",
+				template_season=PACK_TEMPLATE), "Blue Bloods S06 (2010)")
+		check(f"platform tag {spelled!r} in a movie",
+			suggest_name(f"Dune (2021) [{spelled} WEB-DL 1080p][HDO]"), suggest_name("Dune (2021) [WEB-DL 1080p][HDO]"))
+# The name that brought them: Movistar+ written 'M+'
+check("M+ season pack", suggest_name("Blue Bloods (2010) S06 [PACK][M+ WEB-DL 1080p AVC ES-EN AAC 2.0 Subs][HDO]",
+	template_season=PACK_TEMPLATE), "Blue Bloods S06 (2010)")
+# Whatever else still tells a pack apart keeps it without a name
+check("platform tag next to a volume",
+	suggest_name("Show.S04.Vol.1.Netflix.WEB-DL.1080p", template_season=PACK_TEMPLATE), None)
+# A word that only starts like a tag is still a word
+check("tag letters inside a word",
+	suggest_name("Show.S04.Primera.Parte.WEB-DL.1080p", template_season=PACK_TEMPLATE), None)
+check_fields("Show.S01E02.Prime.Time.Paramount.Plus.WEB-DL.1080p.mkv", episode_title="Prime Time")
+
 check("platform tag out of the rendered episode title",
 	suggest_name("Estafadores.de.Tokio.2024.S01E07.Episodio 7.NF.WEB-DL.1080P.ESP.JAP.EAC3 5.1.SUB-Txv2.mkv",
 		template_series="{season}x{episode.2} - {title} - {episode_title}[.{extension}]"),

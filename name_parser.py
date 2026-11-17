@@ -15,7 +15,7 @@ import re
 import unicodedata
 
 # The version of the package (see pyproject.toml, which has to say the same)
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 # Valid video extensions
 VALID_EXTENSIONS = {"mkv", "mp4", "avi", "mov", "wmv", "flv", "webm", "mpg", "mpeg", "m4v", "ts", "m2ts"}
@@ -211,10 +211,24 @@ _PLATFORM_TAGS = [
 	"AMZ", "ATV", "MAX", "PMT", "SHO", "MGM", "LGP", "STZ", "ITV", "MY5",
 	"BBC", "RTE", "VRV", "WKN", "VIU", "VIX", "CBC", "4OD",
 	"NF", "CR", "iP",
+	# Spelled out, as Spanish releases name them ('[M+ WEB-DL 1080p]',
+	# 'Netflix.WEB-DL'). A space stands for any separator or none ('Prime
+	# Video', 'Prime.Video', 'PrimeVideo'), and a trailing '+' needs no tag of
+	# its own: 'Disney+' is 'Disney' and a '+' that is no word
+	"MOVISTAR PLUS", "M+", "NETFLIX", "AMAZON PRIME VIDEO", "AMAZON PRIME", "AMAZON", "PRIME VIDEO", "PRIME",
+	"DISNEY PLUS", "DISNEY", "HBO MAX", "HBO", "SKYSHOWTIME", "SKY SHOWTIME", "APPLE TV PLUS", "APPLE TV",
+	"ATRESPLAYER PREMIUM", "RTVE PLAY", "RAKUTEN TV", "RAKUTEN", "PLUTO TV", "PLUTO", "PARAMOUNT PLUS",
+	"CRUNCHYROLL", "PEACOCK", "FLIXOLE", "LIONSGATE PLUS", "LIONSGATE", "STARZPLAY", "DAZN", "BBC IPLAYER",
+	"CANAL+", "TVE", "LA 1", "LA 2", "TELECINCO", "ANTENA 3", "LA SEXTA", "NEOX", "DMAX",
+	# Regional channels
+	"CANAL SUR", "TV3", "3CAT", "CCMA", "ETB", "EITB", "TVG", "CRTVG", "A PUNT", "À PUNT", "IB3", "TELEMADRID",
+	"CMM", "ARAGON TV", "ARAGÓN TV", "TPA", "RTPA", "TV CANARIA", "7RM", "BETEVE",
 ]
 
+# Longest first, so 'Paramount Plus' is one tag and not 'Paramount' and a stray 'Plus'
 _PLATFORM_TAG_PATTERN = re.compile(
-	r'(?<![A-Za-z0-9])(?:' + "|".join(_PLATFORM_TAGS) + r')(?![A-Za-z0-9])', re.IGNORECASE)
+	r'(?<![A-Za-z0-9])(?:' + "|".join(r'[\s._\-]?'.join(re.escape(word) for word in tag.split(" "))
+		for tag in sorted(_PLATFORM_TAGS, key=len, reverse=True)) + r')(?![A-Za-z0-9])', re.IGNORECASE)
 
 # Separators allowed between a platform tag and the metadata that follows it
 _TAG_SEPARATORS = re.compile(r'[\s._\-\[\]()]*')
